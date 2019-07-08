@@ -7,25 +7,37 @@ import (
 
 func Assert(condition bool, message ...interface{}) {
 	if !condition {
-		panic(buildErrorWithCallerStack(stackStartDepth, AssertionErrorCode, buildMsg(message...), nil))
+		panic(buildException(AssertionErrorCode, nil, message...))
 	}
 }
 func AssertNoError(err interface{}, message ...interface{}) {
 	if err != nil {
-		panic(buildErrorWithCallerStack(stackStartDepth, AssertionErrorCode, buildMsg(message...), err))
+		panic(buildException(AssertionErrorCode, err, message...))
 	}
 }
 func ExitIf(condition bool, message ...interface{}) {
 	if condition {
-		buildErrorWithCallerStack(stackStartDepth, ExitErrorCode, buildMsg(message...), nil).PrintErrorStack()
+		buildException(ExitErrorCode, nil, message...).PrintErrorStack()
 		os.Exit(1)
 	}
 }
 func ExitIfError(err interface{}, message ...interface{}) {
 	if err != nil {
-		buildErrorWithCallerStack(stackStartDepth, ExitErrorCode, buildMsg(message...), err).PrintErrorStack()
+		buildException(ExitErrorCode, err, message...).PrintErrorStack()
 		os.Exit(1)
 	}
+}
+
+func buildException(defaultCode string, cause interface{}, v ...interface{}) *exceptionClass {
+	if len(v) > 0 {
+		if e, ok := v[0].(*exceptionClass); ok {
+			if cause != nil {
+				e.cause = Wrap(cause)
+			}
+			return e
+		}
+	}
+	return buildErrorWithCallerStack(stackStartDepth+1, defaultCode, buildMsg(v...), cause)
 }
 
 func buildMsg(v ...interface{}) string {
