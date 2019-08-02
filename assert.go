@@ -28,9 +28,9 @@ func ExitIfError(err interface{}, message ...interface{}) {
 	}
 }
 
-func buildException(defaultCode string, cause interface{}, v ...interface{}) *exceptionClass {
+func buildException(defaultCode string, cause interface{}, v ...interface{}) *ExceptionClass {
 	if len(v) > 0 {
-		if e, ok := v[0].(*exceptionClass); ok {
+		if e, ok := v[0].(*ExceptionClass); ok {
 			if cause != nil {
 				e.cause = Wrap(cause)
 			}
