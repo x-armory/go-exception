@@ -17,25 +17,25 @@ const (
 	ExitErrorCode       = "EXIT"
 )
 
-type exceptionClass struct {
+type ExceptionClass struct {
 	code         string
 	message      string
 	stackTrace   []*runtime.Frame
-	cause        *exceptionClass
+	cause        *ExceptionClass
 	isWrapped    bool
 	wrappedCause interface{}
 }
 
-func Exception(code string, message string, cause *exceptionClass) *exceptionClass {
+func Exception(code string, message string, cause *ExceptionClass) *ExceptionClass {
 	return buildErrorWithCallerStack(stackStartDepth, code, message, cause)
 }
 
 // wap any object without stack as root cause
-func Wrap(err interface{}) *exceptionClass {
-	if e, ok := err.(*exceptionClass); ok {
+func Wrap(err interface{}) *ExceptionClass {
+	if e, ok := err.(*ExceptionClass); ok {
 		return e
 	}
-	if e, ok := err.(exceptionClass); ok {
+	if e, ok := err.(ExceptionClass); ok {
 		return &e
 	}
 	e := buildErrorWithCallerStack(stackStartDepth, WrappedErrorCode, "", err)
@@ -43,46 +43,46 @@ func Wrap(err interface{}) *exceptionClass {
 	return e
 }
 
-func (e *exceptionClass) Code() string {
+func (e *ExceptionClass) Code() string {
 	return e.code
 }
-func (e *exceptionClass) Message() string {
+func (e *ExceptionClass) Message() string {
 	return e.message
 }
-func (e *exceptionClass) WrappedCause() interface{} {
+func (e *ExceptionClass) WrappedCause() interface{} {
 	return e.wrappedCause
 }
-func (e *exceptionClass) Error() string {
+func (e *ExceptionClass) Error() string {
 	return "<" + e.code + "> " + e.message
 }
-func (e *exceptionClass) IsWrapped() bool {
+func (e *ExceptionClass) IsWrapped() bool {
 	return e.isWrapped
 }
-func (e *exceptionClass) StackTraceString() string {
+func (e *ExceptionClass) StackTraceString() string {
 	var buffer bytes.Buffer
 	e.addStackTraceMessage(&buffer)
 	return buffer.String()
 }
-func (e *exceptionClass) PrintErrorStack() {
+func (e *ExceptionClass) PrintErrorStack() {
 	println(e.StackTraceString())
 }
-func (e *exceptionClass) RootCause() *exceptionClass {
+func (e *ExceptionClass) RootCause() *ExceptionClass {
 	if e.cause == nil {
 		return e
 	} else {
 		return e.cause.RootCause()
 	}
 }
-func (e *exceptionClass) Cause() *exceptionClass {
+func (e *ExceptionClass) Cause() *ExceptionClass {
 	return e.cause
 }
-func (e *exceptionClass) StackTrace() []*runtime.Frame {
+func (e *ExceptionClass) StackTrace() []*runtime.Frame {
 	return e.stackTrace
 }
-func (e *exceptionClass) Throw() {
+func (e *ExceptionClass) Throw() {
 	panic(e)
 }
-func (e *exceptionClass) addStackTraceMessage(buffer *bytes.Buffer) {
+func (e *ExceptionClass) addStackTraceMessage(buffer *bytes.Buffer) {
 	buffer.WriteString("Exception: ")
 	buffer.WriteString(e.Error())
 	for _, t := range e.stackTrace {
@@ -103,14 +103,14 @@ func (e *exceptionClass) addStackTraceMessage(buffer *bytes.Buffer) {
 	}
 }
 
-func buildErrorWithCallerStack(skip int, code string, message string, cause interface{}) *exceptionClass {
+func buildErrorWithCallerStack(skip int, code string, message string, cause interface{}) *ExceptionClass {
 	if code == "" {
 		code = WrappedErrorCode
 	}
-	err := &exceptionClass{code: code, message: message, stackTrace: []*runtime.Frame{}}
+	err := &ExceptionClass{code: code, message: message, stackTrace: []*runtime.Frame{}}
 	depth := rootErrorStackMaxDepth
 	if cause != nil {
-		if e2, ok := cause.(*exceptionClass); ok {
+		if e2, ok := cause.(*ExceptionClass); ok {
 			err.cause = e2
 			depth = middleErrorStackMaxDepth + 1
 		} else if e2, ok := cause.(validator.ValidationErrors); ok {

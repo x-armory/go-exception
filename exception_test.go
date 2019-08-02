@@ -111,10 +111,10 @@ func TestPanicBuildinErrorPerformance(t *testing.T) {
 func TestReturnWrapErrorPerformance(t *testing.T) {
 	t1 := time.Now()
 	for i := 0; i < 100000; i++ {
-		e := func() *exceptionClass {
-			//return Wrap(func() *exceptionClass {
-			//return Wrap(func() *exceptionClass {
-			//return Wrap(func() *exceptionClass {
+		e := func() *ExceptionClass {
+			//return Wrap(func() *ExceptionClass {
+			//return Wrap(func() *ExceptionClass {
+			//return Wrap(func() *ExceptionClass {
 			return Wrap(io.EOF)
 			//}())
 			//}())
